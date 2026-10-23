@@ -5,8 +5,9 @@ const cartItemController = require('../controllers/cartItemController');
 
 router.get("/", cartItemController.getAllCartItems);
 router.get("/:id", cartItemController.getCartItemById);
+router.get("/", cartItemController.getCartItemsByUser)
 router.post("/", cartItemController.createCartItem);
 router.put("/:id", cartItemController.updateCartItem);
-router.delete("/:id", cartItemController.deleteCartItem;
+router.delete("/:id", cartItemController.deleteCartItem);
 
 module.exports = router;

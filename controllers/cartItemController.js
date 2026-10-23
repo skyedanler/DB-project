@@ -1,7 +1,7 @@
 // Cart Item Controller - Handles all cart item-related business logic
 // Cart items are special because they connect Users and Products together,
 // so we need to use "eager loading" (the include option) to fetch related data
-const { CartItem, User, Product } = require('../models');
+const { CartItem, User, Product } = require("../models");
 
 // Get all cart items with populated user and product information
 // TODO: Implement this function
@@ -17,8 +17,13 @@ const { CartItem, User, Product } = require('../models');
 //   })
 exports.getAllCartItems = async (request, response) => {
   try {
-    // TODO: Fetch all cart items WITH user and product data using include
-
+    const cartItems = await CartItem.findAll({
+      include: [
+        { model: User, attributes: ["id", "name", "email"] },
+        { model: Product, attributes: ["id", "name", "price"] },
+      ],
+    });
+    response.status(200).json(cartItems);
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
@@ -33,7 +38,6 @@ exports.getAllCartItems = async (request, response) => {
 exports.getCartItemsByUser = async (request, response) => {
   try {
     // TODO: Find all cart items for a specific user, include product data
-
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
@@ -46,7 +50,6 @@ exports.getCartItemsByUser = async (request, response) => {
 exports.getCartItemById = async (request, response) => {
   try {
     // TODO: Find cart item by ID with includes, handle 404
-
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
@@ -63,7 +66,6 @@ exports.getCartItemById = async (request, response) => {
 exports.createCartItem = async (request, response) => {
   try {
     // TODO: Create cart item, then fetch it with includes, send with 201
-
   } catch (error) {
     response.status(400).json({ error: error.message });
   }
@@ -80,7 +82,6 @@ exports.createCartItem = async (request, response) => {
 exports.updateCartItem = async (request, response) => {
   try {
     // TODO: Find, check exists, update, fetch with includes, send back
-
   } catch (error) {
     response.status(400).json({ error: error.message });
   }
@@ -92,7 +93,6 @@ exports.updateCartItem = async (request, response) => {
 exports.deleteCartItem = async (request, response) => {
   try {
     // TODO: Find cart item, check if exists, delete, send success message
-
   } catch (error) {
     response.status(500).json({ error: error.message });
   }

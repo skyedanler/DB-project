@@ -1,26 +1,24 @@
 // Product Controller - Handles all product-related business logic
-const { Product } = require('../models');
+const { Product } = require("../models");
 
-// Get all products
-// TODO: Implement this function
-// This works exactly like getAllUsers - use Product.findAll()
 exports.getAllProducts = async (request, response) => {
   try {
-    // TODO: Fetch all products and send them as JSON
-
+    const products = await Product.findAll();
+    response.status(200).json(products);
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
 };
 
-// Get single product by ID
-// TODO: Implement this function
-// This works exactly like getUserById - use Product.findByPk()
-// Remember to handle the 404 case!
 exports.getProductById = async (request, response) => {
   try {
     // TODO: Find product by ID, handle 404, send as JSON
-
+    const product = await Product.findByPk(request.params.id);
+    if (!product) {
+      response.status(404).json({ error: "Product not found" });
+    } else {
+      response.status(200).json(product);
+    }
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
@@ -33,7 +31,8 @@ exports.getProductById = async (request, response) => {
 exports.createProduct = async (request, response) => {
   try {
     // TODO: Create a new product from request.body and send with status 201
-
+    const product = await Product.create(request.body);
+    response.status(201).json(product);
   } catch (error) {
     response.status(400).json({ error: error.message });
   }
@@ -45,7 +44,14 @@ exports.createProduct = async (request, response) => {
 exports.updateProduct = async (request, response) => {
   try {
     // TODO: Find product, check if exists, update, send back
+    const product = await Product.findByPk(request.params.id);
 
+    if (product) {
+      await product.update(request.body);
+      response.status(200).json(product);
+    } else {
+      response.status(404).json({ error: 'Product not found'});
+    }
   } catch (error) {
     response.status(400).json({ error: error.message });
   }
@@ -57,7 +63,14 @@ exports.updateProduct = async (request, response) => {
 exports.deleteProduct = async (request, response) => {
   try {
     // TODO: Find product, check if exists, delete, send success message
+    const product = await Product.findByPk(request.params.id);
 
+    if (product) {
+      await product.destroy();
+      response.status(200).json({ message: "Product deleted successfully"});
+    } else {
+      response.status(404).json({ error: "Product not found" });
+    }
   } catch (error) {
     response.status(500).json({ error: error.message });
   }

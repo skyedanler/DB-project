@@ -1,5 +1,5 @@
 // User Controller - Handles all user-related business logic
-const { User } = require('../models');
+const { User } = require("../models");
 
 // Get all users
 // TODO: Implement this function
@@ -9,8 +9,8 @@ const { User } = require('../models');
 //   3. If something goes wrong, catch the error and send a 500 status with the error message
 exports.getAllUsers = async (request, response) => {
   try {
-    // TODO: Fetch all users and send them as JSON
-
+    const users = await User.findAll();
+    response.status(200).json(users);
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
@@ -24,9 +24,12 @@ exports.getAllUsers = async (request, response) => {
 //   3. If found, send the user as JSON
 exports.getUserById = async (request, response) => {
   try {
-    // TODO: Find user by primary key and send as JSON
-    // Remember to handle the case where the user doesn't exist (404)
-
+    const user = await User.findByPk(request.params.id);
+    if (!user) {
+      response.status(404).json({ error: "User not found" });
+    } else {
+      response.status(200).json(user);
+    }
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
@@ -41,7 +44,8 @@ exports.getUserById = async (request, response) => {
 exports.createUser = async (request, response) => {
   try {
     // TODO: Create a new user from request.body and send it back with status 201
-
+    const user = await User.create(request.body);
+    response.status(201).json(user);
   } catch (error) {
     response.status(400).json({ error: error.message });
   }
@@ -57,7 +61,14 @@ exports.createUser = async (request, response) => {
 exports.updateUser = async (request, response) => {
   try {
     // TODO: Find user, check if exists, update, and send back
+    const user = await User.findByPk(request.params.id);
 
+    if (user) {
+      await user.update(request.body);
+      response.status(200).json(user);
+    } else {
+      response.status(404).json({ error: 'User not found'});
+    }
   } catch (error) {
     response.status(400).json({ error: error.message });
   }
@@ -73,7 +84,14 @@ exports.updateUser = async (request, response) => {
 exports.deleteUser = async (request, response) => {
   try {
     // TODO: Find user, check if exists, delete, and send success message
+    const user = await User.findByPk(request.params.id);
 
+    if (user) {
+      await user.destroy();
+      response.status(200).json({ message: 'User deleted successfully'});
+    } else {
+      response.status(404).json({ error: "User not found" });
+    }
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
