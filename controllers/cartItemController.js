@@ -38,6 +38,15 @@ exports.getAllCartItems = async (request, response) => {
 exports.getCartItemsByUser = async (request, response) => {
   try {
     // TODO: Find all cart items for a specific user, include product data
+    const cartItems = await CartItem.findAll({
+      include: [
+        { model: Product, attributes: ["id", "name", "price"] },
+      ],
+      where: {
+        userId: request.params.userId
+      }
+    });
+    response.status(200).json(cartItems);
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
@@ -50,6 +59,19 @@ exports.getCartItemsByUser = async (request, response) => {
 exports.getCartItemById = async (request, response) => {
   try {
     // TODO: Find cart item by ID with includes, handle 404
+    const cartItem = await CartItem.findByPk(request.params.id, {
+      include: [
+        { model: User, attributes: ["id", "name", "email"] },
+        { model: Product, attributes: ["id", "name", "price"] },
+      ],
+    });
+
+    if (!cartItem) {
+      return response.status(404).json({ message: "Cart item not found" });
+    } else {
+      response.status(200).json(cartItem);
+    }
+
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
@@ -65,7 +87,16 @@ exports.getCartItemById = async (request, response) => {
 //   3. Send the populated cart item with status 201
 exports.createCartItem = async (request, response) => {
   try {
-    // TODO: Create cart item, then fetch it with includes, send with 201
+    const cartItem = await CartItem.create(request.body);
+
+    const populatedCartItem = await CartItem.findByPk(cartItem.id, {
+      include: [
+        { model: User, attributes: ["id", "name", "email"] },
+        { model: Product, attributes: ["id", "name", "price"] },
+      ],
+    });
+
+    response.status(201).json(populatedCartItem);
   } catch (error) {
     response.status(400).json({ error: error.message });
   }
@@ -82,6 +113,19 @@ exports.createCartItem = async (request, response) => {
 exports.updateCartItem = async (request, response) => {
   try {
     // TODO: Find, check exists, update, fetch with includes, send back
+    const cartItem = await CartItem.findByPk(request.params.id);
+
+    if (!cartItem) {
+      return response.status(404).json({ error: "Cart Item not found"});
+    } else {
+      await cartItem.update(request.body);
+    }
+
+    const populatedCartItem = await CartItem.findByPk(cartItem.id, {
+      include: [{ model: User }, { model: Product }],
+    });
+
+    response.status(200).json(populatedCartItem);
   } catch (error) {
     response.status(400).json({ error: error.message });
   }
@@ -93,6 +137,14 @@ exports.updateCartItem = async (request, response) => {
 exports.deleteCartItem = async (request, response) => {
   try {
     // TODO: Find cart item, check if exists, delete, send success message
+    const cartItem = await CartItem.findByPk(request.params.id);
+
+    if (!cartItem) {
+      return response.status(404).json({ error: "Cart Item not found" });
+    } else {
+      await cartItem.destroy();
+      response.status(200).json( { message: "Cart item deleted successfully" });
+    }
   } catch (error) {
     response.status(500).json({ error: error.message });
   }
